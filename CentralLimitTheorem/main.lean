@@ -12,9 +12,17 @@ import Mathlib.Data.Complex.Exponential
 -- 2. State lemma 2 in the blueprint
 -- 3. ...
 
-example (X : ℝ → ℝ) : ∀ t : ℝ, ProbabilityTheory.mgf X (ProbabilityTheory.gaussianReal 0 1) t = Real.exp (t ^ 2 / 2) := by
+open MeasureTheory ProbabilityTheory
+
+variable [MeasurableSpace Ω] (μ: Measure Ω) [IsProbabilityMeasure μ]
+variable (X: Ω → ℝ)
+variable (hX: (Measure.map X μ) = (gaussianReal 0 1))
+-- TODO: Assert that X is measurable
+
+
+theorem mgf_of_gaussian: ∀ t : ℝ, mgf X μ t = Real.exp (t ^ 2 / 2) := by
     intro t
-    simp [ProbabilityTheory.mgf, ProbabilityTheory.gaussianReal]
+    simp [mgf]
     sorry
 
 -- #check ProbabilityTheory.mgf fun x => ((ProbabilityTheory.gaussianReal 0 1).measureOf x).toReal (ProbabilityTheory.gaussianReal 0 1)
