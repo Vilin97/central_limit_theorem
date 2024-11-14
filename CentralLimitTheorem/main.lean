@@ -18,6 +18,8 @@ variable [MeasurableSpace Ω] (μ: Measure Ω) [IsProbabilityMeasure μ]
 variable (X: Ω → ℝ)
 -- TODO: Assert that X is measurable
 
+#check μ.trim
+
 theorem mgf_of_gaussian (hXm: Measurable X) (hX: (Measure.map X μ) = (gaussianReal 0 1)) :
   ∀ t : ℝ, mgf X μ t = Real.exp (t ^ 2 / 2) := by
     intro t
@@ -32,8 +34,8 @@ theorem mgf_of_gaussian (hXm: Measurable X) (hX: (Measure.map X μ) = (gaussianR
       _ = ∫ (x : ℝ), Real.exp (t * x) * (gaussianPDFReal 0 1 x) := by
         rw [hX]
         sorry
-      _ = ∫ (x : ℝ), Real.exp (t * x) * (√(2 * Real.pi))⁻¹ * Real.exp (- (x ^ 2) / 2) := by
-        sorry
+      _ = ∫ (x : ℝ), Real.exp (t * x) * ((√(2 * Real.pi))⁻¹ * Real.exp (- (x ^ 2) / 2)) := by
+        simp [gaussianPDFReal]
       _ = ∫ (x : ℝ), (√(2 * Real.pi))⁻¹ * Real.exp (x * t - (x ^ 2) / 2) := by
         sorry
       _ = Real.exp (t ^ 2/ 2) * ∫ (x : ℝ), (√(2 * Real.pi))⁻¹ * Real.exp (- ((x - t) ^ 2) / 2) := by
