@@ -36,8 +36,11 @@ theorem mgf_of_gaussian (hXm: Measurable X) (hX: (Measure.map X μ) = (gaussianR
         sorry
       _ = ∫ (x : ℝ), Real.exp (t * x) * ((√(2 * Real.pi))⁻¹ * Real.exp (- (x ^ 2) / 2)) := by
         simp [gaussianPDFReal]
+      _ = ∫ (x : ℝ), Real.exp (t * x) * (√(2 * Real.pi))⁻¹ * Real.exp (- (x ^ 2) / 2) := by
+        simp only [mul_assoc]
       _ = ∫ (x : ℝ), (√(2 * Real.pi))⁻¹ * Real.exp (x * t - (x ^ 2) / 2) := by
-        sorry
+        rw [mul_comm]
+        -- simp only [mul_comm]
       _ = Real.exp (t ^ 2/ 2) * ∫ (x : ℝ), (√(2 * Real.pi))⁻¹ * Real.exp (- ((x - t) ^ 2) / 2) := by
         sorry
       _ = Real.exp (t ^ 2 / 2) := by
@@ -46,3 +49,11 @@ theorem mgf_of_gaussian (hXm: Measurable X) (hX: (Measure.map X μ) = (gaussianR
 #check mgf_of_gaussian
 
 -- #check ProbabilityTheory.mgf fun x => ((ProbabilityTheory.gaussianReal 0 1).measureOf x).toReal (ProbabilityTheory.gaussianReal 0 1)
+
+example : ∫ (x : ℝ), Real.exp (t * x) * ((√(2 * Real.pi))⁻¹ * Real.exp (- (x ^ 2) / 2)) =  ∫ (x : ℝ), Real.exp (t ^ 2/ 2) * (√(2 * Real.pi))⁻¹ * Real.exp (- ((x - t) ^ 2) / 2) := by
+  rw [← sub_eq_zero, ← integral_sub]
+  apply integral_eq_zero_of_ae
+  rw [Continuous.ae_eq_iff_eq]
+  ext x
+  sorry
+  -- simp [Real.exp_add, mul_comm, mul_assoc]
