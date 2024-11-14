@@ -18,7 +18,13 @@ variable [MeasurableSpace Ω] (μ: Measure Ω) [IsProbabilityMeasure μ]
 variable (X: Ω → ℝ)
 -- TODO: Assert that X is measurable
 
-#check μ.trim
+lemma mgf_of_gaussian_integral_eq: (fun x => Real.exp (t * x) * ((√(2 * Real.pi))⁻¹ * Real.exp (- (x ^ 2) / 2))) =  (fun x => Real.exp (t ^ 2/ 2) * (√(2 * Real.pi))⁻¹ * Real.exp (- ((x - t) ^ 2) / 2)) := by
+  ext x
+  simp [mul_sub, sub_eq_zero, mul_assoc, mul_comm, mul_left_comm, ← Real.exp_sub, ← Real.exp_add]
+  field_simp [Real.exp_ne_zero]
+  rw [← Real.exp_add, ← Real.exp_add]
+  field_simp
+  ring
 
 theorem mgf_of_gaussian (hXm: Measurable X) (hX: (Measure.map X μ) = (gaussianReal 0 1)) :
   ∀ t : ℝ, mgf X μ t = Real.exp (t ^ 2 / 2) := by
@@ -36,24 +42,14 @@ theorem mgf_of_gaussian (hXm: Measurable X) (hX: (Measure.map X μ) = (gaussianR
         sorry
       _ = ∫ (x : ℝ), Real.exp (t * x) * ((√(2 * Real.pi))⁻¹ * Real.exp (- (x ^ 2) / 2)) := by
         simp [gaussianPDFReal]
-      _ = ∫ (x : ℝ), Real.exp (t * x) * (√(2 * Real.pi))⁻¹ * Real.exp (- (x ^ 2) / 2) := by
-        simp only [mul_assoc]
-      _ = ∫ (x : ℝ), (√(2 * Real.pi))⁻¹ * Real.exp (x * t - (x ^ 2) / 2) := by
-        rw [mul_comm]
-        -- simp only [mul_comm]
       _ = Real.exp (t ^ 2/ 2) * ∫ (x : ℝ), (√(2 * Real.pi))⁻¹ * Real.exp (- ((x - t) ^ 2) / 2) := by
-        sorry
+        rw [mgf_of_gaussian_integral_eq]
+        simp [mul_assoc, integral_mul_left]
       _ = Real.exp (t ^ 2 / 2) := by
-        sorry
+        have h: ∫ (x : ℝ), (√(2 * Real.pi))⁻¹ * Real.exp (- ((x - t) ^ 2) / 2) = ∫ (x : ℝ), (gaussianPDFReal t 1 x) := by
+          simp [gaussianPDFReal]
+        rw [h, integral_gaussianPDFReal_eq_one]
+        ring
+        simp only [ne_eq, one_ne_zero, not_false_eq_true]
 
 #check mgf_of_gaussian
-
--- #check ProbabilityTheory.mgf fun x => ((ProbabilityTheory.gaussianReal 0 1).measureOf x).toReal (ProbabilityTheory.gaussianReal 0 1)
-
-example : ∫ (x : ℝ), Real.exp (t * x) * ((√(2 * Real.pi))⁻¹ * Real.exp (- (x ^ 2) / 2)) =  ∫ (x : ℝ), Real.exp (t ^ 2/ 2) * (√(2 * Real.pi))⁻¹ * Real.exp (- ((x - t) ^ 2) / 2) := by
-  rw [← sub_eq_zero, ← integral_sub]
-  apply integral_eq_zero_of_ae
-  rw [Continuous.ae_eq_iff_eq]
-  ext x
-  sorry
-  -- simp [Real.exp_add, mul_comm, mul_assoc]
