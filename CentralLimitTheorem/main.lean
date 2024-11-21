@@ -18,6 +18,8 @@ variable [MeasurableSpace Ω] (μ: Measure Ω) [IsProbabilityMeasure μ]
 variable (X: Ω → ℝ)
 -- TODO: Assert that X is measurable
 
+#check integral_withDensity_eq_integral_smul
+
 lemma mgf_of_gaussian_integral_eq: (fun x => Real.exp (t * x) * ((√(2 * Real.pi))⁻¹ * Real.exp (- (x ^ 2) / 2))) =  (fun x => Real.exp (t ^ 2/ 2) * (√(2 * Real.pi))⁻¹ * Real.exp (- ((x - t) ^ 2) / 2)) := by
   ext x
   simp [mul_sub, sub_eq_zero, mul_assoc, mul_comm, mul_left_comm, ← Real.exp_sub, ← Real.exp_add]
@@ -35,11 +37,22 @@ theorem mgf_of_gaussian (hXm: Measurable X) (hX: (Measure.map X μ) = (gaussianR
       _ = (Measure.map X μ)[fun x => Real.exp (t * x)] := by
         simp
         have t₁: AEMeasurable X μ := by exact Measurable.aemeasurable hXm
-        have t₂: AEStronglyMeasurable (fun x ↦ Real.exp (t * x)) (Measure.map X μ) := by sorry
+        have t₂: AEStronglyMeasurable (fun x ↦ Real.exp (t * x)) (Measure.map X μ) := by
+          apply AEMeasurable.aestronglyMeasurable
+          apply Measurable.aemeasurable
+          apply Real.measurable_exp.comp
+          exact Continuous.measurable (continuous_const.mul continuous_id)
         rw [MeasureTheory.integral_map t₁ t₂]
       _ = ∫ (x : ℝ), Real.exp (t * x) * (gaussianPDFReal 0 1 x) := by
         rw [hX]
-        sorry
+        rw [gaussianReal_of_var_ne_zero]
+        · rw [gaussianPDF_def]
+          simp [ENNReal.ofReal]
+          rw [integral_withDensity_eq_integral_smul]
+          ·
+            sorry
+          sorry
+        exact one_ne_zero
       _ = ∫ (x : ℝ), Real.exp (t * x) * ((√(2 * Real.pi))⁻¹ * Real.exp (- (x ^ 2) / 2)) := by
         simp [gaussianPDFReal]
       _ = Real.exp (t ^ 2/ 2) * ∫ (x : ℝ), (√(2 * Real.pi))⁻¹ * Real.exp (- ((x - t) ^ 2) / 2) := by
