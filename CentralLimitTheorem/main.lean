@@ -18,6 +18,12 @@ variable [MeasurableSpace Ω] (μ: Measure Ω) [IsProbabilityMeasure μ]
 variable (X: Ω → ℝ)
 -- TODO: Assert that X is measurable
 
+-- have h: (fun x => ↑(gaussianPDFReal 0 1 x).toNNReal) = (fun x => (gaussianPDFReal 0 1 x)) := by
+--   ext x
+--   rw [Real.coe_toNNReal]
+--   exact gaussianPDFReal_nonneg 0 1 x
+-- rw [h]
+
 #check integral_withDensity_eq_integral_smul
 
 lemma mgf_of_gaussian_integral_eq: (fun x => Real.exp (t * x) * ((√(2 * Real.pi))⁻¹ * Real.exp (- (x ^ 2) / 2))) =  (fun x => Real.exp (t ^ 2/ 2) * (√(2 * Real.pi))⁻¹ * Real.exp (- ((x - t) ^ 2) / 2)) := by
@@ -27,6 +33,12 @@ lemma mgf_of_gaussian_integral_eq: (fun x => Real.exp (t * x) * ((√(2 * Real.p
   rw [← Real.exp_add, ← Real.exp_add]
   field_simp
   ring
+
+lemma mgf_of_gaussian_integral_eq₂:  (fun x => (gaussianPDFReal 0 1 x).toNNReal • Real.exp (t * x)) = (fun x => Real.exp (t * x) * gaussianPDFReal 0 1 x) := by
+  ext x
+  rw [Real.toNNReal_of_nonneg (gaussianPDFReal_nonneg 0 1 x)]
+  sorry
+
 
 theorem mgf_of_gaussian (hXm: Measurable X) (hX: (Measure.map X μ) = (gaussianReal 0 1)) :
   ∀ t : ℝ, mgf X μ t = Real.exp (t ^ 2 / 2) := by
@@ -45,14 +57,13 @@ theorem mgf_of_gaussian (hXm: Measurable X) (hX: (Measure.map X μ) = (gaussianR
         rw [MeasureTheory.integral_map t₁ t₂]
       _ = ∫ (x : ℝ), Real.exp (t * x) * (gaussianPDFReal 0 1 x) := by
         rw [hX]
-        rw [gaussianReal_of_var_ne_zero]
-        · rw [gaussianPDF_def]
-          simp [ENNReal.ofReal]
-          rw [integral_withDensity_eq_integral_smul]
-          ·
-            sorry
-          sorry
-        exact one_ne_zero
+        rw [gaussianReal_of_var_ne_zero 0 one_ne_zero]
+        rw [gaussianPDF_def]
+        simp [ENNReal.ofReal]
+        simp [toNNreal]
+        rw [integral_withDensity_eq_integral_smul]
+        · simp [mgf_of_gaussian_integral_eq₂]
+        sorry
       _ = ∫ (x : ℝ), Real.exp (t * x) * ((√(2 * Real.pi))⁻¹ * Real.exp (- (x ^ 2) / 2)) := by
         simp [gaussianPDFReal]
       _ = Real.exp (t ^ 2/ 2) * ∫ (x : ℝ), (√(2 * Real.pi))⁻¹ * Real.exp (- ((x - t) ^ 2) / 2) := by
