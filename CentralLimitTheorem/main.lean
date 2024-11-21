@@ -77,3 +77,6 @@ theorem mgf_of_gaussian (hXm: Measurable X) (hX: (Measure.map X μ) = (gaussianR
         simp only [ne_eq, one_ne_zero, not_false_eq_true]
 
 #check mgf_of_gaussian
+
+
+theorem CLT {Y : ι → Ω → ℝ} (h_meas : ∀ (i : ι), Measurable (Y i)) (h_indep : ProbabilityTheory.iIndepFun (fun (i : ι) => inferInstance) Y μ) (h_identically_distributed : true) (h_zero_mean : true) (h_unit_variance : true) (h_gaussian: (Measure.map X μ) = (gaussianReal 0 1)) : ∀ t : ℝ, (μ {w : (Y i) w ≤ t}).tendsto μ {w : (X i) w ≤ t} := sorry
