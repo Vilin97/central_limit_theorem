@@ -19,6 +19,20 @@ variable [MeasurableSpace Ω] (μ: Measure Ω) [IsProbabilityMeasure μ]
 variable (X: Ω → ℝ)
 -- TODO: Assert that X is measurable
 
+theorem CLT
+{Y : ℕ → Ω → ℝ} -- sequence of random variables
+(h_meas : ∀ (i : ℕ), Measurable (Y i)) -- measurable
+(h_indep : ProbabilityTheory.iIndepFun (fun (i : ℕ) => inferInstance) Y μ) -- independent
+(hident : ∀ (i : ℕ), ProbabilityTheory.IdentDistrib (Y i) (Y 0) μ μ) -- identically distributed
+(h_zero_mean : ∀ i, μ[Y i] = 0) -- zero mean
+(h_unit_variance : ∀ i, μ[(Y i)^2] = 1) -- unit variance
+(h_gaussian: (Measure.map X μ) = (gaussianReal 0 1)) -- limit is standard Gaussian
+: ∀ t : ℝ, Filter.Tendsto
+  (fun (n : ℕ) => (μ {w | ∑ i ∈ Finset.range n, (Y i w)/(Real.sqrt n) ≤ t}) - (μ {w | X w ≤ t})) Filter.atTop (nhds 0) := by -- converge in distribution
+  sorry
+
+
+
 -- have h: (fun x => ↑(gaussianPDFReal 0 1 x).toNNReal) = (fun x => (gaussianPDFReal 0 1 x)) := by
 --   ext x
 --   rw [Real.coe_toNNReal]
@@ -76,20 +90,3 @@ theorem mgf_of_gaussian (hXm: Measurable X) (hX: (Measure.map X μ) = (gaussianR
         rw [h, integral_gaussianPDFReal_eq_one]
         ring
         simp only [ne_eq, one_ne_zero, not_false_eq_true]
-
-#check mgf_of_gaussian
-
-
-variable {Y : ℕ → Ω → ℝ}
-#check ∑ i ≤ 2, Y i
-
-theorem CLT
-(h_meas : ∀ (i : ℕ), Measurable (Y i)) -- measurable
-(h_indep : ProbabilityTheory.iIndepFun (fun (i : ℕ) => inferInstance) Y μ) -- independent
-(hident : ∀ (i : ℕ), ProbabilityTheory.IdentDistrib (Y i) (Y 0) μ μ) -- identically distributed
-(h_zero_mean : ∀ i, μ[Y i] = 0) -- zero mean
-(h_unit_variance : ∀ i, μ[(Y i)^2] = 1) -- unit variance
-(h_gaussian: (Measure.map X μ) = (gaussianReal 0 1)) -- limit is standard Gaussian
-: ∀ t : ℝ, Filter.Tendsto
-  (fun (n : ℕ) => (μ {w | ∑ i ∈ Finset.range n, (Y i w)/(Real.sqrt n) ≤ t}) - (μ {w | X w ≤ t})) Filter.atTop (nhds 0) := by -- converge in distribution
-  sorry
