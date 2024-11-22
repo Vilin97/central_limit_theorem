@@ -15,7 +15,7 @@ import Mathlib.Probability.StrongLaw
 
 open MeasureTheory ProbabilityTheory
 
-variable [MeasurableSpace Ω] (μ: Measure Ω) [IsProbabilityMeasure μ]
+variable [MeasurableSpace Ω] (μ: Measure Ω)
 variable (X: Ω → ℝ)
 -- TODO: Assert that X is measurable
 
@@ -51,9 +51,10 @@ lemma mgf_of_gaussian_integral_eq: (fun x => Real.exp (t * x) * ((√(2 * Real.p
 
 lemma mgf_of_gaussian_integral_eq₂:  (fun x => (gaussianPDFReal 0 1 x).toNNReal • Real.exp (t * x)) = (fun x => Real.exp (t * x) * gaussianPDFReal 0 1 x) := by
   ext x
-  rw [Real.toNNReal_of_nonneg (gaussianPDFReal_nonneg 0 1 x)]
-  sorry
-
+  rw [NNReal.smul_def]
+  rw [Real.coe_toNNReal (gaussianPDFReal 0 1 x) (gaussianPDFReal_nonneg 0 1 x)]
+  rw [mul_comm (Real.exp (t * x)) (gaussianPDFReal 0 1 x)]
+  rfl
 
 theorem mgf_of_gaussian (hXm: Measurable X) (hX: (Measure.map X μ) = (gaussianReal 0 1)) :
   ∀ t : ℝ, mgf X μ t = Real.exp (t ^ 2 / 2) := by
@@ -75,10 +76,10 @@ theorem mgf_of_gaussian (hXm: Measurable X) (hX: (Measure.map X μ) = (gaussianR
         rw [gaussianReal_of_var_ne_zero 0 one_ne_zero]
         rw [gaussianPDF_def]
         simp [ENNReal.ofReal]
-        simp [toNNreal]
         rw [integral_withDensity_eq_integral_smul]
         · simp [mgf_of_gaussian_integral_eq₂]
-        sorry
+        apply Measurable.real_toNNReal
+        exact measurable_gaussianPDFReal 0 1
       _ = ∫ (x : ℝ), Real.exp (t * x) * ((√(2 * Real.pi))⁻¹ * Real.exp (- (x ^ 2) / 2)) := by
         simp [gaussianPDFReal]
       _ = Real.exp (t ^ 2/ 2) * ∫ (x : ℝ), (√(2 * Real.pi))⁻¹ * Real.exp (- ((x - t) ^ 2) / 2) := by
