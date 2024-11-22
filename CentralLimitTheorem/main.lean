@@ -17,7 +17,6 @@ open MeasureTheory ProbabilityTheory
 
 variable [MeasurableSpace Ω] (μ: Measure Ω)
 variable (X: Ω → ℝ)
--- TODO: Assert that X is measurable
 
 theorem CLT
 {Y : ℕ → Ω → ℝ} -- sequence of random variables
@@ -30,16 +29,6 @@ theorem CLT
 : ∀ t : ℝ, Filter.Tendsto
   (fun (n : ℕ) => (μ {w | ∑ i ∈ Finset.range n, (Y i w)/(Real.sqrt n) ≤ t}) - (μ {w | X w ≤ t})) Filter.atTop (nhds 0) := by -- converge in distribution
   sorry
-
-
-
--- have h: (fun x => ↑(gaussianPDFReal 0 1 x).toNNReal) = (fun x => (gaussianPDFReal 0 1 x)) := by
---   ext x
---   rw [Real.coe_toNNReal]
---   exact gaussianPDFReal_nonneg 0 1 x
--- rw [h]
-
-#check integral_withDensity_eq_integral_smul
 
 lemma mgf_of_gaussian_integral_eq: (fun x => Real.exp (t * x) * ((√(2 * Real.pi))⁻¹ * Real.exp (- (x ^ 2) / 2))) =  (fun x => Real.exp (t ^ 2/ 2) * (√(2 * Real.pi))⁻¹ * Real.exp (- ((x - t) ^ 2) / 2)) := by
   ext x
