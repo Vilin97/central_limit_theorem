@@ -1,3 +1,4 @@
+import Mathlib.Analysis.SpecialFunctions.Pow.Deriv
 import Mathlib.Probability.Moments
 import Mathlib.Probability.Distributions.Gaussian
 import Mathlib.Data.Complex.Exponential
@@ -16,7 +17,6 @@ import Mathlib.Probability.StrongLaw
 open MeasureTheory ProbabilityTheory
 
 variable [MeasurableSpace Ω] (μ: Measure Ω)
-variable (X: Ω → ℝ)
 
 theorem CLT
 {Y : ℕ → Ω → ℝ} -- sequence of random variables
@@ -45,7 +45,7 @@ lemma mgf_of_gaussian_integral_eq₂:  (fun x => (gaussianPDFReal 0 1 x).toNNRea
   rw [mul_comm (Real.exp (t * x)) (gaussianPDFReal 0 1 x)]
   rfl
 
-theorem mgf_of_gaussian (hXm: Measurable X) (hX: (Measure.map X μ) = (gaussianReal 0 1)) :
+theorem mgf_of_gaussian (X: Ω → ℝ) (hXm: Measurable X) (hX: (Measure.map X μ) = (gaussianReal 0 1)) :
   ∀ t : ℝ, mgf X μ t = Real.exp (t ^ 2 / 2) := by
     intro t
     calc
@@ -80,3 +80,58 @@ theorem mgf_of_gaussian (hXm: Measurable X) (hX: (Measure.map X μ) = (gaussianR
         rw [h, integral_gaussianPDFReal_eq_one]
         ring
         simp only [ne_eq, one_ne_zero, not_false_eq_true]
+
+theorem mgf_of_iid_unit_norm
+{Y : ℕ → Ω → ℝ} -- sequence of random variables
+{Z : Ω → ℝ}
+(h_meas : ∀ (i : ℕ), Measurable (Y i)) -- measurable
+(h_indep : ProbabilityTheory.iIndepFun (fun (i : ℕ) => inferInstance) Y μ) -- independent
+(hident : ∀ (i : ℕ), ProbabilityTheory.IdentDistrib (Y i) (Y 0) μ μ) -- identically distributed
+(h_zero_mean : ∀ i, μ[Y i] = 0) -- zero mean
+(h_unit_variance : ∀ i, μ[(Y i)^2] = 1) -- unit variance
+(n : ℕ)
+(n_neq_zero : n ≠ 0)
+(Z_def : ∀ w : Ω, Z w = ∑ i ∈ Finset.range n, (Y i w) / (Real.sqrt n))
+: ∀ t : ℝ, mgf Z μ t = (mgf (Y 0) μ (t / Real.sqrt n)) ^ n := by
+  sorry
+
+-- TODO: add little o term
+theorem lemma4
+{Yi : Ω → ℝ}
+(h_meas : Measurable Yi)
+(h_zero_mean : μ[Yi] = 0) -- zero mean
+(h_unit_variance : μ[Yi ^ 2] = 1) -- unit variance
+(n : ℕ)
+(n_neq_zero : n ≠ 0)
+: ∀ t : ℝ, mgf Yi μ (t / Real.sqrt n) = 1 + t ^ 2 / (2 * n) := by
+  sorry
+-- Asymptotics.IsLittleO
+
+-- TODO: add little o term
+theorem lemma5
+: ∀ t : ℝ, Filter.Tendsto (fun (n : ℕ) => (1 + t ^ 2 / (2 * n)) ^ n) Filter.atTop (nhds (Real.exp (t ^ 2 / 2))) := by
+  intro t
+  let t' : ℝ := t ^ 2 / 2
+  have h₁ : (fun (n : ℕ) => (1 + t ^ 2 / (2 * n)) ^ n) = (fun (n : ℕ) => (1 + t' / n) ^ n) := by
+    ext n
+    simp [t']
+    ring
+  have h₂ : Real.exp (t ^ 2 / 2) = Real.exp t' := by
+    simp [t']
+  rw [h₁, h₂]
+  apply tendsto_one_plus_div_pow_exp
+
+theorem lemma6
+{Y : ℕ → Ω → ℝ} -- sequence of random variables
+{Z : Ω → ℝ}
+{X: Ω → ℝ}
+(hXm: Measurable X)
+(hX: (Measure.map X μ) = (gaussianReal 0 1))
+(h_meas : ∀ (i : ℕ), Measurable (Y i)) -- measurable
+(h_indep : ProbabilityTheory.iIndepFun (fun (i : ℕ) => inferInstance) Y μ) -- independent
+(hident : ∀ (i : ℕ), ProbabilityTheory.IdentDistrib (Y i) (Y 0) μ μ) -- identically distributed
+(h_zero_mean : ∀ i, μ[Y i] = 0) -- zero mean
+(h_unit_variance : ∀ i, μ[(Y i)^2] = 1) -- unit variance
+(Z_def : ∀ n : ℕ, ∀ w : Ω, Z w = ∑ i ∈ Finset.range n, (Y i w) / (Real.sqrt n))
+: ∀ t : ℝ, Filter.Tendsto (fun (n : ℕ) => mgf Z μ t - mgf X μ t) Filter.atTop (nhds 0) := by
+  sorry
