@@ -83,16 +83,14 @@ theorem mgf_of_gaussian (X: Ω → ℝ) (hXm: Measurable X) (hX: (Measure.map X 
 
 theorem mgf_of_iid_unit_norm
 {Y : ℕ → Ω → ℝ} -- sequence of random variables
-{Z : Ω → ℝ}
+{Z : ℕ → Ω → ℝ} -- sum of a given number of random variables
 (h_meas : ∀ (i : ℕ), Measurable (Y i)) -- measurable
 (h_indep : ProbabilityTheory.iIndepFun (fun (i : ℕ) => inferInstance) Y μ) -- independent
 (hident : ∀ (i : ℕ), ProbabilityTheory.IdentDistrib (Y i) (Y 0) μ μ) -- identically distributed
 (h_zero_mean : ∀ i, μ[Y i] = 0) -- zero mean
 (h_unit_variance : ∀ i, μ[(Y i)^2] = 1) -- unit variance
-(n : ℕ)
-(n_neq_zero : n ≠ 0)
-(Z_def : ∀ w : Ω, Z w = ∑ i ∈ Finset.range n, (Y i w) / (Real.sqrt n))
-: ∀ t : ℝ, mgf Z μ t = (mgf (Y 0) μ (t / Real.sqrt n)) ^ n := by
+(Z_def : ∀ n : ℕ, ∀ w : Ω, Z n w = ∑ i ∈ Finset.range n, (Y i w) / (Real.sqrt n)) -- def of Z as the sum of a given number of random variables
+: ∀ n : ℕ, ∀ t : ℝ, mgf (Z n) μ t = (mgf (Y 0) μ (t / Real.sqrt n)) ^ n := by
   sorry
 
 -- TODO: add little o term
@@ -101,9 +99,7 @@ theorem lemma4
 (h_meas : Measurable Yi)
 (h_zero_mean : μ[Yi] = 0) -- zero mean
 (h_unit_variance : μ[Yi ^ 2] = 1) -- unit variance
-(n : ℕ)
-(n_neq_zero : n ≠ 0)
-: ∀ t : ℝ, mgf Yi μ (t / Real.sqrt n) = 1 + t ^ 2 / (2 * n) := by
+: ∀ n : ℕ, n ≠ 0 → (∀ t : ℝ, mgf Yi μ (t / Real.sqrt n) = 1 + t ^ 2 / (2 * n)) := by
   sorry
 -- Asymptotics.IsLittleO
 
@@ -123,7 +119,7 @@ theorem lemma5
 
 theorem lemma6
 {Y : ℕ → Ω → ℝ} -- sequence of random variables
-{Z : Ω → ℝ}
+{Z : ℕ → Ω → ℝ} -- sum of a given number of random variables
 {X: Ω → ℝ}
 (hXm: Measurable X)
 (hX: (Measure.map X μ) = (gaussianReal 0 1))
@@ -132,6 +128,6 @@ theorem lemma6
 (hident : ∀ (i : ℕ), ProbabilityTheory.IdentDistrib (Y i) (Y 0) μ μ) -- identically distributed
 (h_zero_mean : ∀ i, μ[Y i] = 0) -- zero mean
 (h_unit_variance : ∀ i, μ[(Y i)^2] = 1) -- unit variance
-(Z_def : ∀ n : ℕ, ∀ w : Ω, Z w = ∑ i ∈ Finset.range n, (Y i w) / (Real.sqrt n))
-: ∀ t : ℝ, Filter.Tendsto (fun (n : ℕ) => mgf Z μ t - mgf X μ t) Filter.atTop (nhds 0) := by
+(Z_def : ∀ n : ℕ, ∀ w : Ω, Z n w = ∑ i ∈ Finset.range n, (Y i w) / (Real.sqrt n)) -- def of Z as the sum of a given number of random variables
+: ∀ t : ℝ, Filter.Tendsto (fun (n : ℕ) => mgf (Z n) μ t - mgf X μ t) Filter.atTop (nhds 0) := by
   sorry
