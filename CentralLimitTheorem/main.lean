@@ -153,3 +153,12 @@ theorem lemma6
 (Z_def : ∀ n : ℕ, ∀ w : Ω, Z n w = ∑ i ∈ Finset.range n, (Y i w) / (Real.sqrt n)) -- def of Z as the sum of a given number of random variables
 : ∀ t : ℝ, Filter.Tendsto (fun (n : ℕ) => mgf (Z n) μ t - mgf X μ t) Filter.atTop (nhds 0) := by
   sorry
+
+-- exp (↑(-x) * Complex.I)
+
+theorem levy_continuity
+{X : ℕ → Ω → ℝ} -- sequence of random variables
+{Y : Ω → ℝ} -- another random variable
+(pointwise_conv : ∀ t : ℝ, Filter.Tendsto (fun (n : ℕ) => mgf (X n) μ t - mgf Y μ t) Filter.atTop (nhds 0)) -- mgf Xn and mgf Y converge pointwise
+: ∀ t : ℝ, Filter.Tendsto (fun (n : ℕ) => (μ {w | ∑ i ∈ Finset.range n, (X i w) ≤ t}) - (μ {w | Y w ≤ t})) Filter.atTop (nhds 0) := by
+  sorry
