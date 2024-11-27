@@ -18,18 +18,6 @@ open MeasureTheory ProbabilityTheory
 
 variable [MeasurableSpace Ω] (μ: Measure Ω)
 
-theorem CLT
-{Y : ℕ → Ω → ℝ} -- sequence of random variables
-(h_meas : ∀ (i : ℕ), Measurable (Y i)) -- measurable
-(h_indep : ProbabilityTheory.iIndepFun (fun (i : ℕ) => inferInstance) Y μ) -- independent
-(hident : ∀ (i : ℕ), ProbabilityTheory.IdentDistrib (Y i) (Y 0) μ μ) -- identically distributed
-(h_zero_mean : ∀ i, μ[Y i] = 0) -- zero mean
-(h_unit_variance : ∀ i, μ[(Y i)^2] = 1) -- unit variance
-(h_gaussian: (Measure.map X μ) = (gaussianReal 0 1)) -- limit is standard Gaussian
-: ∀ t : ℝ, Filter.Tendsto
-  (fun (n : ℕ) => (μ {w | ∑ i ∈ Finset.range n, (Y i w)/(Real.sqrt n) ≤ t}) - (μ {w | X w ≤ t})) Filter.atTop (nhds 0) := by -- converge in distribution
-  sorry
-
 -- MGF of standard gaussian is exp(t^2/2)
 theorem mgf_of_gaussian (X: Ω → ℝ) (hXm: Measurable X) (hX: (Measure.map X μ) = (gaussianReal 0 1)) :
   ∀ t : ℝ, mgf X μ t = Real.exp (t ^ 2 / 2) := by
@@ -103,7 +91,7 @@ theorem mgf_of_iid
 (h_indep : ProbabilityTheory.iIndepFun (fun (i : ℕ) => inferInstance) Y μ) -- independent
 (hident : ∀ (i : ℕ), ProbabilityTheory.IdentDistrib (Y i) (Y 0) μ μ) -- identically distributed
 (Z_def : ∀ n : ℕ, Z n = (Real.sqrt n)⁻¹ • (∑ i ∈ Finset.range n, (Y i)) ) -- def of Z as the sum of a given number of random variables
-: ∀ n : ℕ, ∀ t : ℝ, mgf (Z n) μ t = (mgf (Y 0) μ (t * (√↑n)⁻¹)) ^ n := by
+: ∀ n : ℕ, ∀ t : ℝ, mgf (Z n) μ t = (mgf (Y 0) μ (t * (√n)⁻¹)) ^ n := by
     intro n
     rw [Z_def]
     intro t
@@ -138,6 +126,14 @@ theorem lemma5
     simp [t']
   rw [h₁, h₂]
   apply tendsto_one_plus_div_pow_exp
+
+-- hard!
+theorem lemma45
+{Yi : Ω → ℝ}
+(h_meas : Measurable Yi)
+(h_zero_mean : μ[Yi] = 0) -- zero mean
+(h_unit_variance : μ[Yi ^ 2] = 1) -- unit variance
+: ∀ t : ℝ, Filter.Tendsto (fun (n : ℕ) => mgf Yi μ (t / Real.sqrt n)) Filter.atTop (nhds (Real.exp (t ^ 2 / 2))) := sorry
 
 theorem lemma6
 {Y : ℕ → Ω → ℝ} -- sequence of random variables
