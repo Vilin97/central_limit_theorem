@@ -70,8 +70,7 @@ theorem mgf_of_gaussian (X: Ω → ℝ) (hXm: Measurable X) (hX: (Measure.map X 
 
 -- (mgf α • X) t = (mgf X) (α * t)
 lemma mgf_smul_left (X : Ω → ℝ) (α t : ℝ) : (mgf (α • X)) μ t = (mgf X) μ (t * α) := by
-    rw [mgf, mgf]
-    simp [mul_assoc]
+    simp only [mgf, Pi.smul_apply, smul_eq_mul, mul_assoc]
 
 -- mgfs of identically distributed function are equal
 lemma mgf_ident_fun (X Y : Ω → ℝ) (hident : IdentDistrib X Y μ μ) : mgf X μ t = mgf Y μ t := by
