@@ -14,3 +14,5 @@ Run `lake exe cache get` in the terminal to get the mathlib cache.
 Restart the lean file if it asks for it.
 
 (Optional) Install the `Github Codespace` extension in VSCode, go to Remote Explorer, select `GitHub Codespace` from the dropdown at the top, and connect to your codespace. If `Remote Explorer` is not visible right-click on the sidebar and select `Remote Explorer`.
+
+See [this instruction](https://docs.github.com/en/codespaces/developing-in-a-codespace/using-github-codespaces-in-visual-studio-code) for a more complete set of instructions.
